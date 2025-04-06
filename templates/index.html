@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>SHL Assessment Recommendation Engine</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { color: #333; }
+        .form-container { max-width: 600px; margin-bottom: 20px; }
+        label { display: block; margin: 10px 0 5px; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 20px; background-color: #007BFF; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .results { margin-top: 20px; }
+        .result-item { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>SHL Assessment Recommendation Engine</h1>
+    <div class="form-container">
+        <form method="POST">
+            <label>Job Role:</label>
+            <input type="text" name="job_role" placeholder="e.g., Manager" required>
+            
+            <label>Industry:</label>
+            <select name="industry" required>
+                <option value="All">All Industries</option>
+                <option value="Tech">Tech</option>
+                <option value="Finance">Finance</option>
+                <option value="Retail">Retail</option>
+                <option value="Call Centers">Call Centers</option>
+            </select>
+            
+            <label>Skills (comma-separated):</label>
+            <input type="text" name="skills" placeholder="e.g., Leadership, Communication" required>
+            
+            <label>Job Level:</label>
+            <select name="level" required>
+                <option value="Entry">Entry</option>
+                <option value="Mid">Mid</option>
+                <option value="Senior">Senior</option>
+            </select>
+            
+            <button type="submit">Get Recommendations</button>
+        </form>
+    </div>
+    {% if recommendations %}
+    <div class="results">
+        <h2>Recommended Assessments:</h2>
+        {% for rec in recommendations %}
+        <div class="result-item">
+            <strong>{{ rec.name }}</strong> (Score: {{ rec.score }}/100)<br>
+            Type: {{ rec.type }}<br>
+            Description: {{ rec.description }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</body>
+</html>
