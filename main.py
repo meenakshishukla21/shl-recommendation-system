@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 
-#Create a flask app instance
+# Create a Flask app instance
 app = Flask(__name__)
 
 # Hardcoded SHL-like catalogue (replace with real data from SHL)
@@ -81,7 +81,6 @@ def recommend_assessments(input_data, catalogue):
     recommendations.sort(key=lambda x: x["score"], reverse=True)
     return recommendations[:3]
 
-# Define a route and a view function
 # Flask routes
 @app.route("/", methods=["GET", "POST"])
 def home():
@@ -99,6 +98,41 @@ def home():
         recommendations = recommend_assessments(user_input, catalogue)
     
     return render_template('index.html', recommendations=recommendations)
+
+# New GET API endpoint returning JSON
+@app.route("/api/recommendations", methods=["GET"])
+def get_recommendations():
+    try:
+        # Collect query parameters from the GET request
+        job_role = request.args.get("job_role")
+        industry = request.args.get("industry")
+        skills = request.args.get("skills")  # Expecting comma-separated skills
+        level = request.args.get("level")
+
+        # Validate required parameters
+        if not all([job_role, industry, skills, level]):
+            return jsonify({"error": "Missing required parameters: job_role, industry, skills, level"}), 400
+
+        # Prepare input data
+        user_input = {
+            "job_role": job_role,
+            "industry": industry,
+            "skills": [skill.strip() for skill in skills.split(",")],
+            "level": level,
+            "purpose": "Hiring"  # Hardcoded for simplicity
+        }
+
+        # Get recommendations
+        recommendations = recommend_assessments(user_input, catalogue)
+
+        # Return JSON response
+        return jsonify({
+            "status": "success",
+            "recommendations": recommendations
+        }), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # Run the app
 if __name__ == "__main__":
